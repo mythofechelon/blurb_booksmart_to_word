@@ -13,10 +13,25 @@
 from docx import Document # Install using "pip install python-docx"
 import defusedxml.ElementTree as ET # Install using "pip install defusedxml"
 import re, os, html
+import argparse
+
+CLIParser = argparse.ArgumentParser(description='A test program.')
+
+CLIParser.add_argument("-p", "--Path", help="Enter path to .BOOK file", type=str)
+CLIParser.add_argument("-t", "--Title", help="Enter book footer / title (including leading or trailing spaces)", type=str)
+
+CLIArgs = CLIParser.parse_args()
+
+if not CLIArgs.Path == "":
+    bookfile_original_path_full = CLIArgs.Path
+if not CLIArgs.Title == "":
+    bookfile_title = CLIArgs.Title
 
 bookfile_original_path_valid = False
 while bookfile_original_path_valid == False:
-    bookfile_original_path_full = input("Enter path to .BOOK file: ").strip("'").strip('"')
+    if bookfile_original_path_full == None:
+        bookfile_original_path_full = input("Enter path to .BOOK file: ").strip("'").strip('"')
+    
     bookfile_original_ext = bookfile_original_path_full.rsplit(".", 1)[1]
     if not os.path.exists(bookfile_original_path_full) or not bookfile_original_ext == "book":
         print("File path invalid.")
@@ -26,7 +41,8 @@ bookfile_xml_path_full = bookfile_original_path_full + ".xml"
 bookfile_docx_path_full = bookfile_original_path_full + ".docx"
 bookfile_log_path_full = bookfile_original_path_full + ".log"
 
-bookfile_title = input("Enter book footer / title (including leading or trailing spaces): ")
+if bookfile_original_path_full == "":
+    bookfile_title = input("Enter book footer / title (including leading or trailing spaces): ")
 
 print("")
 
