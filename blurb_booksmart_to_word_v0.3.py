@@ -95,7 +95,7 @@ bookfile_log_object = open(bookfile_log_path_full, "w", encoding="utf-8")
 for counter, node_linkedlist in enumerate(bookfile_xml_ET_nodes_linkedlist):
     newparagraphneeded = False
     
-    node_linkedlist_children = node_linkedlist.getchildren()
+    node_linkedlist_children = list(node_linkedlist)
     
     textformatting_italic = False
     textformatting_bold = False
