@@ -117,6 +117,7 @@ document = Document()
 # Create accompanying log file
 bookfile_log_object = open(bookfile_log_path_full, "w", encoding="utf-8")
 
+lastParagraphSingleLetter = False
 for counter, node_linkedlist in enumerate(bookfile_xml_ET_nodes_linkedlist):
     newparagraphneeded = False
     
@@ -142,6 +143,16 @@ for counter, node_linkedlist in enumerate(bookfile_xml_ET_nodes_linkedlist):
     if re.search("^(\t+|\s{2,}|[\t\s]{2,})[^\s]+", string) or counter < 5:
         newparagraphneeded = True
     
+    # Check if string only contains a single character. If so, no new paragraph needed. 
+    # A single character usually means a single big letter that prefix a word. So it's better to just make it a single word in the converting process.
+    if len(string.strip()) == 1:
+        lastParagraphSingleLetter = True
+        newparagraphneeded = True
+
+    if lastParagraphSingleLetter:
+        newparagraphneeded = False
+        lastParagraphSingleLetter = False
+
     # The next line / if statement looks for and excludes header or footer content (book title and page numbers) and empty lines
     if (string != bookfile_title) and (not re.search("^\d{1,4}$", string)) and (not re.search("^\n\s*$", string)):
         print("")
