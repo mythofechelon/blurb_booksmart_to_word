@@ -13,20 +13,45 @@
 from docx import Document # Install using "pip install python-docx"
 import defusedxml.ElementTree as ET # Install using "pip install defusedxml"
 import re, os, html
+import argparse
+
+CLIParser = argparse.ArgumentParser(description='A program to convert blurp\'s *.BOOK file to DocX format.')
+
+CLIParser.add_argument("-p", "--Path", help="Enter path to .BOOK file", type=str)
+CLIParser.add_argument("-t", "--Title", help="Enter book footer / title (including leading or trailing spaces)", type=str)
+CLIParser.add_argument("-lp", "--LogPath", help="Enter path for logfile. Include file path, filename, and file extention", type=str)
+CLIParser.add_argument("-dp", "--DocPath", help="Enter path for docx file. Include file path, filename, and file extention", type=str)
+
+CLIArgs = CLIParser.parse_args()
+
+if not CLIArgs.Path == "":
+    bookfile_original_path_full = CLIArgs.Path
+if not CLIArgs.Title == "":
+    bookfile_title = CLIArgs.Title
+if not CLIArgs.LogPath == "":
+     bookfile_log_path_full = CLIArgs.LogPath
+if not CLIArgs.DocPath == "":
+     bookfile_docx_path_full = CLIArgs.DocPath
 
 bookfile_original_path_valid = False
 while bookfile_original_path_valid == False:
-    bookfile_original_path_full = input("Enter path to .BOOK file: ").strip("'").strip('"')
+    if bookfile_original_path_full == None:
+        bookfile_original_path_full = input("Enter path to .BOOK file: ")
+    bookfile_original_path_full = bookfile_original_path_full.strip("'").strip('"')
     bookfile_original_ext = bookfile_original_path_full.rsplit(".", 1)[1]
     if not os.path.exists(bookfile_original_path_full) or not bookfile_original_ext == "book":
         print("File path invalid.")
     else:
         bookfile_original_path_valid = True
 bookfile_xml_path_full = bookfile_original_path_full + ".xml"
-bookfile_docx_path_full = bookfile_original_path_full + ".docx"
-bookfile_log_path_full = bookfile_original_path_full + ".log"
 
-bookfile_title = input("Enter book footer / title (including leading or trailing spaces): ")
+if bookfile_docx_path_full == None:
+    bookfile_docx_path_full = bookfile_original_path_full + ".docx"
+if bookfile_docx_path_full == None:
+    bookfile_log_path_full = bookfile_original_path_full + ".log"
+
+if bookfile_original_path_full == "":
+    bookfile_title = input("Enter book footer / title (including leading or trailing spaces): ")
 
 print("")
 
@@ -92,10 +117,11 @@ document = Document()
 # Create accompanying log file
 bookfile_log_object = open(bookfile_log_path_full, "w", encoding="utf-8")
 
+lastParagraphSingleLetter = False
 for counter, node_linkedlist in enumerate(bookfile_xml_ET_nodes_linkedlist):
     newparagraphneeded = False
     
-    node_linkedlist_children = node_linkedlist.getchildren()
+    node_linkedlist_children = list(node_linkedlist)
     
     textformatting_italic = False
     textformatting_bold = False
@@ -117,6 +143,16 @@ for counter, node_linkedlist in enumerate(bookfile_xml_ET_nodes_linkedlist):
     if re.search("^(\t+|\s{2,}|[\t\s]{2,})[^\s]+", string) or counter < 5:
         newparagraphneeded = True
     
+    # Check if string only contains a single character. If so, no new paragraph needed. 
+    # A single character usually means a single big letter that prefix a word. So it's better to just make it a single word in the converting process.
+    if len(string.strip()) == 1:
+        lastParagraphSingleLetter = True
+        newparagraphneeded = True
+
+    if lastParagraphSingleLetter:
+        newparagraphneeded = False
+        lastParagraphSingleLetter = False
+
     # The next line / if statement looks for and excludes header or footer content (book title and page numbers) and empty lines
     if (string != bookfile_title) and (not re.search("^\d{1,4}$", string)) and (not re.search("^\n\s*$", string)):
         print("")
@@ -140,9 +176,18 @@ for counter, node_linkedlist in enumerate(bookfile_xml_ET_nodes_linkedlist):
         if string.startswith("Chapter"):
             document.add_heading(string, 1)
         '''
-        
-        run = paragraph.add_run(string)
-        
+
+        # The first proper string sometimes does not have a paragraph to write too. So we create one here.
+        while True:
+            try:
+                run = paragraph.add_run(string)
+            except NameError:
+                print("New paragraph detected as being needed. Adding...")
+                bookfile_log_object.write("New paragraph detected as being needed. Adding...\n")
+                paragraph = document.add_paragraph()
+                continue
+            break
+
         font = run.font
         if textformatting_italic == True:
             print("Italic formatting detected. Adding...")
