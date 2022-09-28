@@ -165,9 +165,18 @@ for counter, node_linkedlist in enumerate(bookfile_xml_ET_nodes_linkedlist):
         if string.startswith("Chapter"):
             document.add_heading(string, 1)
         '''
-        
-        run = paragraph.add_run(string)
-        
+
+        # The first proper string sometimes does not have a paragraph to write too. So we create one here.
+        while True:
+            try:
+                run = paragraph.add_run(string)
+            except NameError:
+                print("New paragraph detected as being needed. Adding...")
+                bookfile_log_object.write("New paragraph detected as being needed. Adding...\n")
+                paragraph = document.add_paragraph()
+                continue
+            break
+
         font = run.font
         if textformatting_italic == True:
             print("Italic formatting detected. Adding...")
