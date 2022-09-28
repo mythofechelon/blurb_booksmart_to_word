@@ -30,8 +30,8 @@ if not CLIArgs.Title == "":
 bookfile_original_path_valid = False
 while bookfile_original_path_valid == False:
     if bookfile_original_path_full == None:
-        bookfile_original_path_full = input("Enter path to .BOOK file: ").strip("'").strip('"')
-    
+        bookfile_original_path_full = input("Enter path to .BOOK file: ")
+    bookfile_original_path_full = bookfile_original_path_full.strip("'").strip('"')
     bookfile_original_ext = bookfile_original_path_full.rsplit(".", 1)[1]
     if not os.path.exists(bookfile_original_path_full) or not bookfile_original_ext == "book":
         print("File path invalid.")
