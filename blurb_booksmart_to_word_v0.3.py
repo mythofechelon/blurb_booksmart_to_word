@@ -15,7 +15,7 @@ import defusedxml.ElementTree as ET # Install using "pip install defusedxml"
 import re, os, html
 import argparse
 
-CLIParser = argparse.ArgumentParser(description='A test program.')
+CLIParser = argparse.ArgumentParser(description='A program to convert blurp\'s *.BOOK file to DocX format.')
 
 CLIParser.add_argument("-p", "--Path", help="Enter path to .BOOK file", type=str)
 CLIParser.add_argument("-t", "--Title", help="Enter book footer / title (including leading or trailing spaces)", type=str)
