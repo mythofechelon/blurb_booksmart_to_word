@@ -19,6 +19,8 @@ CLIParser = argparse.ArgumentParser(description='A test program.')
 
 CLIParser.add_argument("-p", "--Path", help="Enter path to .BOOK file", type=str)
 CLIParser.add_argument("-t", "--Title", help="Enter book footer / title (including leading or trailing spaces)", type=str)
+CLIParser.add_argument("-lp", "--LogPath", help="Enter path for logfile. Include file path, filename, and file extention", type=str)
+CLIParser.add_argument("-dp", "--DocPath", help="Enter path for docx file. Include file path, filename, and file extention", type=str)
 
 CLIArgs = CLIParser.parse_args()
 
@@ -26,6 +28,10 @@ if not CLIArgs.Path == "":
     bookfile_original_path_full = CLIArgs.Path
 if not CLIArgs.Title == "":
     bookfile_title = CLIArgs.Title
+if not CLIArgs.LogPath == "":
+     bookfile_log_path_full = CLIArgs.LogPath
+if not CLIArgs.DocPath == "":
+     bookfile_docx_path_full = CLIArgs.DocPath
 
 bookfile_original_path_valid = False
 while bookfile_original_path_valid == False:
@@ -38,8 +44,11 @@ while bookfile_original_path_valid == False:
     else:
         bookfile_original_path_valid = True
 bookfile_xml_path_full = bookfile_original_path_full + ".xml"
-bookfile_docx_path_full = bookfile_original_path_full + ".docx"
-bookfile_log_path_full = bookfile_original_path_full + ".log"
+
+if bookfile_docx_path_full == None:
+    bookfile_docx_path_full = bookfile_original_path_full + ".docx"
+if bookfile_docx_path_full == None:
+    bookfile_log_path_full = bookfile_original_path_full + ".log"
 
 if bookfile_original_path_full == "":
     bookfile_title = input("Enter book footer / title (including leading or trailing spaces): ")
