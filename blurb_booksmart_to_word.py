@@ -2,15 +2,7 @@
 Description:
 	Take a .BOOK file from Blurb BookSmart and convert it to a .DOCX Microsoft Word file.
 
-Version history:
-	• v1.0.0:
-		- Author: Ben Hooper (https://mythofechelon.co.uk/)
-		- Date: 2026/03/13
-		- Changes:
-			= Implemented best practices learned since.
-			= Added handling of required packages not being installed.
-			= Fixed error "AttributeError: 'xml.etree.ElementTree.Element' object has no attribute 'getchildren'".
-			= Removed requirement to supply the book footer.
+Pre-GitHub version history:
 	• v0.3:
 		- Author: Ben Hooper (https://mythofechelon.co.uk/)
 		- Date: 2021/05/26
@@ -58,7 +50,6 @@ package_install_instructions = "Required package not installed. To fix this:\n1.
 
 try:
 	from docx import Document
-	# import beautifulsoup
 except ModuleNotFoundError:
 	package_name = "python-docx"
 	
